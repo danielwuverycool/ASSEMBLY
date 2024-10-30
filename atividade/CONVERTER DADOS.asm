@@ -3,15 +3,17 @@
 .STACK 100H
 
 .DATA
-    STRING1 DB 'DIGITE: $'
+    SAVE DW ?
+    STRING1 DB 'DIGITE UM NUMERO (0-255): $'
+    STRING2 DB 10,13,'HEXADECIMAL: $'
+    STRING3 DB 10,13,'OCTAL: $'
+    STRING4 DB 10,13,'BINARIO: $'
 
 
 .CODE
 
     ;description
     INPUT PROC
-
-
         MOV AH,9
         LEA DX,STRING1
         INT 21H
@@ -23,7 +25,6 @@
         MOV BL,10
         DIGITE:
             MOV DL,AL
-            MOV AL,CL
 
             MOV AH,1
             INT 21H
@@ -35,23 +36,24 @@
             MUL BL
            
             JMP DIGITE
-
-            
             
         FIM:
-            MOV BX,CX
+            MOV SAVE,CX
             RET
         
     INPUT ENDP
 
     ;description
     HEX PROC
+        MOV AH,9
+        LEA DX,STRING2
+        INT 21H
+        MOV BX,SAVE
         MOV AH,2
         MOV CX,4
+
         IMPRIME:
-
             MOV DL,BH
-
             SHR DL,4    
             CMP DL,10
             JAE LETRA
@@ -61,7 +63,6 @@
             JMP FINAL
 
         LETRA:
-        
             ADD DL,'A'
             SUB DL,10
             INT 21H
@@ -69,21 +70,50 @@
         FINAL:
             ROL BX,4
             LOOP IMPRIME
-
+        
         RET
-
     HEX ENDP
 
     ;description
     OCTO PROC
+        MOV AH,9
+        LEA DX,STRING3
+        INT 21H
+        MOV BX,SAVE
+        XOR BH,BH
+        XOR DH,DH
+        MOV DL,BH
+        MOV AH,2
         MOV CX,5
-        SHL BX,3
+
+        ARMAZENA:
+            ROR BX,3
+            MOV DL,BH
+            SHR DL,5
+            PUSH DX
+            LOOP ARMAZENA
+
+        MOV CX,5
+
+        PRINT:
+            POP DX
+            ADD DL,'0'
+            INT 21H
+            LOOP PRINT
+
+        RET
+
+
     OCTO ENDP
 
     ;description
     BINARY PROC
+        MOV AH,9
+        LEA DX,STRING4
+        INT 21H
         MOV AH,2
-        MOV CX,16
+        MOV CX,15
+
         IMPRIMIR:
             SHL BX,1
             JNC ZERO
@@ -91,22 +121,35 @@
             MOV DL,'1'
             INT 21H
 
-            DEC CX
-
-            CMP CX,0
-            JNZ IMPRIMIR
+            LOOP IMPRIMIR
+            JMP ENDING
 
         ZERO:
             MOV DL,'0'
             INT 21H
 
-            DEC CX
+            LOOP IMPRIMIR
 
-            CMP CX,0
-            JNZ IMPRIMIR
-        RET
+        ENDING:
+            RET
 
     BINARY ENDP
+
+    PULALINHA MACRO 
+        PUSH AX
+        PUSH DX
+
+        MOV AH,2
+        MOV DL,10
+        INT 21H
+
+        MOV AH,2
+        MOV DL,13
+        INT 21H
+
+        POP AX
+        POP DX
+    ENDM
 
     ;description
     MAIN PROC
@@ -114,7 +157,12 @@
         MOV DS,AX
 
         CALL INPUT
+
         CALL HEX
+        PULALINHA
+        CALL OCTO
+        PULALINHA
+        CALL BINARY
 
         MOV AH,4CH
         INT 21H
