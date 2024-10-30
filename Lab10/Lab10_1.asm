@@ -11,7 +11,7 @@
 
 .CODE
 
-    PULA_LINHA MACRO 
+    PULA_LINHA MACRO            ;MACRO PARA PULAR LINHA
         PUSH AX 
         PUSH DX
 
@@ -28,42 +28,42 @@
 
     ENDM
 
-    ;description
+    ;PROCEDIMENTO PARA IMPRIMIR MATRIZ (ENTRADA: MATRIZ SAÍDA: VOID)
     IMPRIMIR_MATRIZ PROC
 
-        XOR BX,BX
-        PUSH AX
+        XOR BX,BX;ZERA BX
+        PUSH AX;AX NO TOPO DA PILHA
 
 
-        MOV AH,2
+        MOV AH,2;IMPRIMIR CARACTER
         
 
         RESET:
-            MOV CX,4
-            XOR SI,SI
+            MOV CX,4;CONTADOR 4
+            XOR SI,SI;ZERA SI
         IMPRIME:
-            MOV DL,MATRIZ4X4[BX][SI]
-            ADD DL,'0'
+            MOV DL,MATRIZ4X4[BX][SI];DL VIRA A MATRIZ DA POSICAO BX E SI
+            ADD DL,'0';CONVERTE EM CARACTER
             INT 21H
-            INC SI
-            LOOP IMPRIME
+            INC SI;INCREMENTA SI
+            LOOP IMPRIME;LOOP NO LABEL IMPRIME
 
-            ADD BX,4
-            PULA_LINHA
-            CMP BX,12
-            JBE RESET
+            ADD BX,4 ;ADICIONA 4 EM BX 
+            PULA_LINHA ;PULA LINHA
+            CMP BX,12;COMPARA 12 COM BX
+            JBE RESET;PULA SE MENOR OU IGUAL
         
-        RET
+        RET;RETORNA MAIN
 
     IMPRIMIR_MATRIZ ENDP
 
     MAIN PROC
-        MOV AX,@DATA
+        MOV AX,@DATA;PERMITE ACESSO AO SEGMENTO DE DADOS
         MOV DS,AX
 
-        CALL IMPRIMIR_MATRIZ
+        CALL IMPRIMIR_MATRIZ;CHAMA PROCEDIMENTO
 
-        MOV AH,4CH
+        MOV AH,4CH;FINALIZA O PROGRAMA
         INT 21H
     MAIN ENDP
 END MAIN
