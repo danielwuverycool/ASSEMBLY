@@ -44,87 +44,86 @@
             ADD DL,AL;ADICIONA DL COM AL
             MOV MATRIZ [BX][SI],AL ;ALOCA AL PARA A MATRIZ
             
-            INC SI
-            LOOP DIGITE
-            ADD BX,4
-            CMP BX,12
-            JBE RESET
+            INC SI;INCREMENTA SI
+            LOOP DIGITE;FAZ O LOOP DA LABEL DIGITE
+            ADD BX,4;ADICIONA BX COM 4
+            CMP BX,12;COMPARA BX COM 12
+            JBE RESET;PULA PARA LABEL RESET SE FOR MENOR OU IGUAL A 12
 
-            MOV BX,DX
+            MOV BX,DX;BX É ATRIBUIDO PARA DX
 
-            CALL IMPRIMIR_QTD
-            RET
+            CALL IMPRIMIR_QTD;CHAMA PROCEDIMENTO DE IMPRIMIR_QTD
+            RET;RETORNA A MAIN
 
     LER ENDP
 
-    ;description
+    ;ENTRADA: MATRIZ SAÍDA: VOID
     IMPRIMIR_MATRIZ PROC
-        XOR DH,DH
-        MOV AH,2
-        XOR BX,BX
+        XOR DH,DH ;ZERA DH
+        MOV AH,2;IMPRIME CARACTER
+        XOR BX,BX;ZERA BX
 
         REINICIAR:
-            PULALINHA
-            XOR SI,SI
-            MOV CX,4
+            PULALINHA;MACRO PULA LINHA
+            XOR SI,SI;ZERA SI
+            MOV CX,4;MOVE 4 PARA CX
 
         DIGITAR:
-            MOV DL,MATRIZ [BX][SI]
-            ADD DL,'0'
+            MOV DL,MATRIZ [BX][SI];OS DADOS DA MATRIZ É MOVIDO PARA DL
+            ADD DL,'0';CONVERTE O VALOR EM CARACTER ASCII
             INT 21H
             
-            INC SI
-            LOOP DIGITAR
-            ADD BX,4
-            CMP BX,12
+            INC SI;INCREMENTA SI
+            LOOP DIGITAR;FAZ UM LOOP DE DIGITAR
+            ADD BX,4;ADICIONA BX COM 4
+            CMP BX,12;COMPARA BX COM 12 E REPETE SE FORM MENOR OU IGUAL AO MESMO
             JBE REINICIAR
             RET
     IMPRIMIR_MATRIZ ENDP
 
+
+    ;ENTRADA: BX SAÍDA: VOID
     IMPRIMIR_QTD PROC
-        MOV CL,10
-        XOR BH,BH
-        MOV AX,BX
-        DIV CL
+        MOV CL,10;MOVE 10 PARA CL
+        XOR BH,BH;ZERA BH
+        MOV AX,BX;PASSA BX PARA AX
+        DIV CL;DIVIDE AX POR CL
 
-        MOV DX,AX
+        MOV DX,AX;RESULTADO É ARMAZENADO EM DX
 
-        PUSH DX
+        PUSH DX;DX É ARMAZENADO NO SP
 
-        PULALINHA
+        PULALINHA;PULA LINHA
 
-        MOV AH,9
+        MOV AH,9;IMPRIME STRING
         LEA DX,MSG2
         INT 21H
 
-        POP DX
+        POP DX;RECUPERA DADO ARMAZENADO EM SP
 
-        
-
-
-        MOV AH,2
+        MOV AH,2;IMPRIME O QUOCIENTE (PRIMEIRO ALGARISMO)
         ADD DL,'0'
         INT 21H
 
-        ROR DX,8
+        ROR DX,8;FAZ ROTATE 8 BITS
 
-        ADD DL,'0'
+        ADD DL,'0';IMPRIME O RESTO (SEGUNDO ALGARITMO)
         INT 21H
         RET
     IMPRIMIR_QTD ENDP
 
-    ;description
+
     MAIN PROC
-        MOV AX,@DATA
+        MOV AX,@DATA ;PERMITE ACESSO AO SEGMENTO DE DADOS
         MOV DS,AX
 
-        CALL LER
+        CALL LER;CHAMA PROCEDIMENTO LER
 
-        PULALINHA
+        PULALINHA;PULA A LINHA
 
-        CALL IMPRIMIR_MATRIZ
+        CALL IMPRIMIR_MATRIZ;CHAMA O PROCEDIMENTO IMPRIMIR_MATRIZ
 
-        MOV AH,4CH
+        MOV AH,4CH;FINALIZA PROGRAMA
         INT 21H
     MAIN ENDP
 END MAIN
